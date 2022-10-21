@@ -1,0 +1,42 @@
+import { StyleSheet } from "react-native";
+
+export default style=StyleSheet.create({
+    image:{
+        width:"100%",
+        height:260,
+        borderBottomLeftRadius:10,
+        borderBottomRightRadius:10
+    },
+    desc:{
+       padding:10
+    },
+    titleContainer:{
+        margin:10
+    },
+    title:{
+        fontSize:17,
+        fontWeight:"900"
+    },
+    descContainer:{
+        margin:10,
+        flexDirection:"row"
+    },
+    ProgressContainer:{
+        margin:10
+    },
+    ProgressBar:{
+        height:6,
+        borderRadius:10,
+        backgroundColor:"#d3d3d3"
+    },
+    price:{
+        flexDirection:"row",
+        justifyContent:"space-between"
+    },
+    buttonContainer:{
+        paddingTop:10
+    },
+    buttonText:{
+        fontWeight:"800"
+    }
+})
