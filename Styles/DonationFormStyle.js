@@ -3,7 +3,8 @@ import { StyleSheet } from "react-native";
 export default style=StyleSheet.create({
     container:{
         flex:1,
-        justifyContent:"center"
+      
+        
     },
     subContainer:{
        
@@ -108,7 +109,8 @@ export default style=StyleSheet.create({
         borderColor:"#a9a9a9",
         borderWidth:1,
         textAlign:"center",
-        borderRadius:10
+        borderRadius:10,
+        color:"#000000"
     },
     buttonContainer:{
         margin:10
@@ -152,11 +154,13 @@ export default style=StyleSheet.create({
     cardField:{
         width:"100%",
         height:50,
-        marginVertical:5
+        marginVertical:5,
+        color:"#000000"
     },
     secureText:{
         fontSize:16,
-        paddingTop:5
+        paddingTop:5,
+        color:"#696969"
     },
     link:{
         color:"red",
@@ -179,9 +183,25 @@ export default style=StyleSheet.create({
     },
     claimGiftText:{
         fontSize:16,
-    },claimGiftContainer:{
+        color:"#696969"
+    },
+    claimGiftContainer:{
         flexDirection:"row",
         marginTop:6,
         alignItems:"center"
+    },
+    phoneContainer:{
+        height:50,
+        width:"94%",
+        marginLeft:10,
+        borderColor:"#d3d3d3",
+        borderWidth:1,
+        borderRadius:5,
+        backgroundColor:"#EEEEEE"
+    },
+    textContainerStyle:{
+        backgroundColor:"#EEEEEE",
+        color:"#000000"
     }
+    
 })

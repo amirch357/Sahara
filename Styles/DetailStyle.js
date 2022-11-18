@@ -8,14 +8,16 @@ export default style=StyleSheet.create({
         borderBottomRightRadius:10
     },
     desc:{
-       padding:10
+       padding:10,
+       color:"#000"
     },
     titleContainer:{
         margin:10
     },
     title:{
         fontSize:17,
-        fontWeight:"900"
+        fontWeight:"900",
+        color:"#000000"
     },
     descContainer:{
         margin:10,
@@ -37,6 +39,13 @@ export default style=StyleSheet.create({
         paddingTop:10
     },
     buttonText:{
-        fontWeight:"800"
+        fontWeight:"800",
+        color:"#FFF"
+    },
+    donation:{
+        color:"#696969"
+    },
+    number:{
+        color:"#696969"
     }
 })

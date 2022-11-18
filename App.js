@@ -14,7 +14,7 @@ const App = () => {
    <Provider>
     <NativeBaseProvider>
     <NavigationContainer>
-    <StripeProvider>
+    <StripeProvider publishableKey="pk_test_51LvCmDH2x2uIwt5QIoVbTANQroTp70YAxN3owF7DgS3tTNNERyDaO7cwsNm7C4VvaG6ghz4Qcmm5tVZimrQv10WQ00GEvKKwms">
       <Routes />
       </StripeProvider>
     </NavigationContainer>

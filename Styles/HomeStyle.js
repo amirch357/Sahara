@@ -5,7 +5,8 @@ export default style=StyleSheet.create({
 flex:1
     },
     button:{
-        margin:10
+        margin:10,
+        marginTop:25
     },
     catcontainer:{
         margin:10,

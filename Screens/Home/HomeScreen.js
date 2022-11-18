@@ -1,5 +1,5 @@
 import React,{useState,useEffect} from "react";
-import { View,Text,TouchableOpacity,ScrollView,ActivityIndicator,Image } from "react-native";
+import { View,Text,TouchableOpacity,ScrollView,ActivityIndicator,Image,BackHandler,Alert, RefreshControl,FlatList } from "react-native";
 import { Button } from "react-native-paper";
 import style from "../../Styles/HomeStyle"
 import ButtonGroup from "../../Components/ButtonGroup/ButtonGroup";
@@ -8,10 +8,15 @@ import PapularCampCard from "../../Components/PapularCampCard/PapularCampCard";
 import useCampaignState from "../../utils/Campaign.state";
 import { IMAGE_URL } from "../../utils/Link";
 
+
+
+
+
 const HomeScreen = ({navigation}) => {
-    const {data,loading}= useCampaignState()
+    const {data,loading,networkError,refreshing,onRefresh}= useCampaignState()
 
 const [filters,setFilters]=useState([])
+
 
   const pressed=(item)=>{
   if(item===0){
@@ -24,10 +29,28 @@ const [filters,setFilters]=useState([])
   }
 
 
-
+  const backActionHome = () => {
+    Alert.alert("Hold on!", "Are you sure you want to go back?", [
+      {
+        text: "Cancel",
+        onPress: () => null,
+        style: "cancel"
+      },
+      { text: "YES", onPress: () => BackHandler.exitApp() }
+    ]);
+    return true;
+  };
 
 useEffect(()=>{
   setFilters(pressed())
+  
+
+   BackHandler.addEventListener(
+    "hardwareBackPress",
+    backActionHome
+  );
+
+  return () => BackHandler.removeEventListener("hardwareBackPress", backActionHome);
     
 },[])
 
@@ -45,10 +68,10 @@ const Disaster=data.filter(function(item){
 
 
     return (
-        <ScrollView>
+        <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
         <View style={style.container}>
         <View style={style.button}>
-        <Button mode="contained" buttonColor="#8b0000" onPress={()=>navigation.navigate("APPEAL")}>Donate Now</Button>
+        <Button mode="contained" buttonColor="#8b0000" textColor="#FFFF" onPress={()=>navigation.navigate("APPEAL")}>Donate Now</Button>
         </View>
         <View style={style.catcontainer}>
         <Text style={style.cattext}>Category</Text>
@@ -64,23 +87,23 @@ const Disaster=data.filter(function(item){
                 </TouchableOpacity>
 
             </View>
-            
+           
             <View style={{flexDirection:"row",alignItems:"center",justifyContent:"center"}}>
             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
            
-            {
-              loading?<View style={{justifyContent:"center",alignItems:"center",paddingLeft:50,paddingTop:40}}><ActivityIndicator size="large" color="red" /></View>:
+            {networkError?<Text style={{marginLeft:10,fontSize:20}}>No Internet Connection</Text>:
+              loading || refreshing ?<View style={{justifyContent:"center",alignItems:"center",paddingLeft:50,paddingTop:40}}><ActivityIndicator size="large" color="red" /></View>:
             filters?
                 filters.map((item)=>(
                   <View key={item.ID}>
-            <PapularCampCard  progress={item.goal?.percentage_completed} image={{uri:`${IMAGE_URL}/${item.IMAGE}`}}  title={item.TITLE} goal={item.GOAL} raised={item.RAISED} onPress={()=>{navigation.navigate("Detail",{title:item.TITLE,dESC:item.DESCRIPTION,goal:item.GOAL,raised:item.RAISED,progress:"27",image:`${IMAGE_URL}/${item.IMAGE}`})}} loading={loading} />
+            <PapularCampCard  progress={item.GOAL_AVERAGE} image={{uri:`${IMAGE_URL}/${item.IMAGE}`}}  title={item.TITLE} goal={item.GOAL} raised={item.RAISED}   onPress={()=>{navigation.navigate("Detail",{title:item.TITLE,dESC:item.DESCRIPTION,goal:item.GOAL,raised:item.RAISED,progress:item.GOAL_AVERAGE,image:`${IMAGE_URL}/${item.IMAGE}`})}} loading={loading} />
             </View>
            ))
             :
           
            data.slice(0,3). map((i)=>(
             <View key={i.ID}>
-                <PapularCampCard  goal={i.GOAL} image={{uri:`${IMAGE_URL}/${i.IMAGE}`}}  progress={i.goal?.percentage_completed} raised={i.RAISED} title={i.TITLE} onPress={()=>{navigation.navigate("Detail",{title:i.TITLE,desc:i.DESCRIPTION,goal:i.GOAL,raised:i.RAISED,progress:"45",image:`${IMAGE_URL}/${i.IMAGE}`})}} loading={loading} />
+                <PapularCampCard  goal={i.GOAL} image={{uri:`${IMAGE_URL}/${i.IMAGE}`}}  progress={i.GOAL_AVERAGE} raised={i.RAISED} title={i.TITLE} onPress={()=>{navigation.navigate("Detail",{title:i.TITLE,desc:i.DESCRIPTION,goal:i.GOAL,raised:i.RAISED,progress:i.GOAL_AVERAGE,image:`${IMAGE_URL}/${i.IMAGE}`})}} loading={loading} />
                 </View>
                 ))
            

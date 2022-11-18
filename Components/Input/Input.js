@@ -1,22 +1,22 @@
 //import liraries
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { TextInput } from 'react-native-paper';
+import { Input } from 'native-base';
 
 
 // create a component
-const Input = ({label,required,error,errorMessage,value,onChangeText}) => {
+const InputC = ({label,required,error,errorMessage,value,onChangeText,defaultValue,keyboardType,autoCapitalize}) => {
     return (
         <View style={styles.container}>
             <View style={styles.inputContainer}>
                 <View style={styles.titleContainer}>
-                <Text>{label}</Text>
+                <Text style={{color:"#696969"}}>{label}</Text>
                 {required?
                 <Text style={styles.required}>*</Text>
 :""}
                 </View>
            
-                <TextInput mode="outlined" error={error} value={value} onChangeText={onChangeText}/>
+                <Input mode="outlined" error={error} value={value} onChangeText={onChangeText} defaultValue={defaultValue} keyboardType={keyboardType} autoCapitalize={autoCapitalize} />
             {error?
             <>
              
@@ -50,4 +50,4 @@ const styles = StyleSheet.create({
 });
 
 //make this component available to the app
-export default Input;
+export default InputC;

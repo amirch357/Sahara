@@ -1,16 +1,29 @@
-import React,{useState,useEffect} from "react";
-import { View,Text,ScrollView,TextInput,ActivityIndicator,TouchableOpacity } from "react-native";
+import React,{useState,useEffect,useRef} from "react";
+import { View,Text,ScrollView,TextInput,ActivityIndicator,TouchableOpacity,RefreshControl} from "react-native";
 import style from "../../Styles/DonationFormStyle"
 import { RadioButton,Button,Modal,Portal,Checkbox } from "react-native-paper";
 import CurrencyPicker from "react-native-currency-picker"
 import Icon from "react-native-vector-icons/Ionicons";
-import {CardField} from "@stripe/stripe-react-native"
+import {CardField,presentPaymentSheet,useStripe,useConfirmPayment} from "@stripe/stripe-react-native"
 import axios from "axios";
 import { Select } from "native-base";
-import Input from "../../Components/Input/Input";
+import InputC from "../../Components/Input/Input";
+import { PAYMENT_URL } from "../../utils/Link";
+import SuccessModel from "../../Components/SuccessModel/SuccessModel";
+import { LocalStorageService } from "../../Components/LocalStorage/LocalStorage";
+import PhoneInput from "../../Components/PhoneInput/PhoneInput";
 
 
-const DonationForm = () => {
+
+
+
+const wait = (timeout) => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+  }
+
+
+const DonationForm = ({route}) => {
+    const stripe=useStripe()
     const [value,setValue]=useState("")
     const [currency,setCurrency]=useState("$")
     const [amount,setAmount]=useState("1")
@@ -23,12 +36,30 @@ const DonationForm = () => {
     const [typeValue,setTypeValue]=useState("stripe")
     const [showModel,setShowModel]=useState(false)
     const [checked, setChecked] = React.useState(false);
-    const [fName,setFname]=useState("")
+    const [name,setName]=useState("")
     const [error,setError]=useState(false)
+    const [email,setEmail]=useState("")
+    const [phone,setPhone]=useState("")
+    const [Model,setModel]=useState(false)
+    const [submitLoding,setSubmitLoding]=useState(false)
+    const [refresh,setRefresh]=useState(false)
+    const [showCountry,setShowCountry]=useState(false)
+    const [countryCode, setCountryCode] = useState("+1");
+    const [emailerror,setEmailError]=useState(false)
+    const [phoneError,setPhoneError]=useState(false)
+   
+    
+    
+
+
+   
+    
+    const shwoSuccessModal=()=>setModel(true)
+    const hideSuccessModal=()=>setModel(false)
 
     const showModal = () => setShowModel(true);
     const hideModal = () => setShowModel(false);
-
+const {title}=route.params
 
 const CurrencyConvert= async()=>{
    await axios.get(`https://api.exchangerate.host/convert?from=USD&to=${code}`).then((res)=>{
@@ -40,22 +71,95 @@ setLargeValue(largeValue.toFixed(2))
 setLoading(false)
     })
 }
+
+
+
+
+const fetchPaymentData= async ()=>{
+    
+   const {paymentMethod}= await stripe.createPaymentMethod({
+    paymentMethodType:"Card",
+    paymentMethodData:{
+        billingDetails:{
+            name:name,
+            email:email
+        }
+
+    }
+   })
+   console.log("result..............",paymentMethod.billingDetails)
+    const data= await axios.post(PAYMENT_URL,{name:name,amount:value,email:email,phone:phone,currency:code,paymentMethodId:paymentMethod.id,title:title,countryCode:countryCode}).then((responce)=>{
+         console.log("data......",responce.data)
+         const data=responce.data
+         const clientSecret=responce.data.client_secret
+         const customer=responce.data.customer
+         const ephemeralKey=responce.data.ephemeralKey
+         setSubmitLoding(false)
+     return {clientSecret,customer,ephemeralKey,data}      
+     })
+return{data}
+   
+}
+
+const initializePayement= async ()=>{
+    const {data}= await fetchPaymentData()
+    console.log("key........",data.data.UserData)
+    const {error}= await stripe.initPaymentSheet({
+        customerId:data.customer,
+        customerEphemeralKeySecret:data.ephemeralKey,
+        paymentIntentClientSecret:data.clientSecret,
+        merchantDisplayName:name,
+        allowsDelayedPaymentMethods:true,
+
+        
+    })
+   
+    if(error){
+        alert(error.message)
+        setSubmitLoding(false)
+    }else{
+        shwoSuccessModal()
+        LocalStorageService.setItem("UserData",data.data.UserData)
+        LocalStorageService.setItem("donorId",data.data.donor_id)
+
+    }
+    stripe.retrievePaymentIntent(data.clientSecret).then((responce)=>{
+        console.log("status..............",responce.paymentIntent.status)
+    })
+}
+
+
+
 const onSubmit=()=>{
-    if(fName.length===0){
+    if(name.length===0){
         setError(true)
+    
+        
+    }else if(email.length===0){
+        setEmailError(true)
+    }else if(phone.length===0){
+        setPhoneError(true)
     }else{
         setError(false)
-        console.log("my Total amount=",fName)
+        initializePayement()
+        setSubmitLoding(true)
+        
     }
 }
 const onDonate=()=>{
     if(value.length===0){
         alert("Please Enter amount")
+       
     }else
     if(show==false){
         setShow(true)
+        
+        
     }else{
-        onSubmit()
+       onSubmit()
+       
+      
+       
     }
 }
 const totalAmount=value*amount
@@ -64,13 +168,20 @@ const totalAmount=value*amount
 useEffect(()=>{
 CurrencyConvert()
 
-})
 
+},[])
+const onRefresh = React.useCallback(() => {
+    setRefresh(true);
+    wait(2000).then(() => setRefresh(false));
+  }, []);
 
     return (
-        <ScrollView>
-        <View style={style.container}>
+        <ScrollView refreshControl={<RefreshControl refreshing={refresh} onRefresh={onRefresh} />}>
             
+        <View style={style.container}>
+        
+        
+         
        
                             
             {loading?
@@ -117,6 +228,7 @@ CurrencyConvert()
                                 <Text style={style.headingText}>Enter Amount</Text>
                             </View><View style={style.amountContainer}>
                                 <View style={style.amountSubContainer}>
+                                    
                                     <View style={style.currencyPiker}>
                                         <CurrencyPicker
                                             showFlag={false}
@@ -126,9 +238,11 @@ CurrencyConvert()
                                             darkMode={false}
                                             onSelectCurrency={(data) => { console.log("DATA..........", data.code), setCurrency(data.symbol_native), setCode(data.code); } } />
                                     </View>
+                                   
                                     <View style={style.iconContainer}>
                                         <Icon name="caret-down" color="#808080" />
                                     </View>
+                                    
                                 </View>
                                 <View style={style.amountInput}>
                                     <TextInput keyboardType="numeric" style={style.input} value={value} onChangeText={(v) => { setValue(v); } } onPressIn={() => setValue("")} />
@@ -169,11 +283,11 @@ CurrencyConvert()
                                 <View style={{flexDirection:"row",justifyContent:"space-evenly"}}>
                                     <View style={{flexDirection:"row"}}>
                                         <RadioButton value="stripe"/>
-                                        <Text style={{fontSize:18,paddingTop:5}}>Strip-Cradit Card</Text>
+                                        <Text style={{fontSize:18,paddingTop:5,color:"#696969"}}>Strip-Cradit Card</Text>
                                     </View>
                                     <View style={{flexDirection:"row"}}>
                                         <RadioButton value="paypal" />
-                                        <Text style={{fontSize:18,paddingTop:5}}>Paypal</Text>
+                                        <Text style={{fontSize:18,paddingTop:5,color:"#696969"}}>Paypal</Text>
                                     </View>
                                 </View>
                             </RadioButton.Group>
@@ -181,14 +295,14 @@ CurrencyConvert()
                             <Text style={style.headingText}>Personal Info</Text>
                             </View>
                             <View>
-                                <Input label="First Name" required value={fName} onChangeText={(n)=>{setFname(n),setError(false)}} error={error} errorMessage="Please Enter your name"/>
-                                <Input label="Last Name" required/>
-                                <Input label="Email" required/>
+                                <InputC label="Name" required value={name} onChangeText={(n)=>{setName(n),setError(false)}} error={error} errorMessage="Please Enter your name"/>
+                                <InputC label="Email" required value={email} onChangeText={(e)=>{setEmail(e);setEmailError(false)}} keyboardType="email-address" autoCapitalize="none" error={emailerror} errorMessage="Please Enter your Email" />
+                                <PhoneInput  show={showCountry} onPress={()=>setShowCountry(true)} pickerButtonOnPress={(item)=>{setCountryCode(item.dial_code);setShowCountry(false)}} countryCode={countryCode} value={phone} onChangeText={(p)=>{setPhone(p),setPhoneError(false)}} required error={phoneError} errorMessage="enter your phone" />
                                 
                             </View>
                             <View style={style.headingContainer}>
                             <Text style={style.headingText}>Reclaim Gift Aid</Text>
-                            <Text>Add 25% more to your donation at no cost to you. A Gift Aid declaration allows Sahara For Life Trust to claim tax back on eligible donations. It means that for every £1 you donate to Sahara For Life Trust we can claim back 25p, at no extra cost to you.</Text>
+                            <Text style={{color:"#696969"}}>Add 25% more to your donation at no cost to you. A Gift Aid declaration allows Sahara For Life Trust to claim tax back on eligible donations. It means that for every £1 you donate to Sahara For Life Trust we can claim back 25p, at no extra cost to you.</Text>
                             <TouchableOpacity onPress={showModal}><Text style={style.link}>Tell me more {">>"}</Text></TouchableOpacity>
                            <Portal>
                            <Modal visible={showModel} onDismiss={hideModal} contentContainerStyle={style.contentContainerStyle} >
@@ -204,6 +318,7 @@ The amount of tax we claim will be 25% of the total value of your donations in t
                                 
                                 
                             </Modal>
+                            <SuccessModel visibale={Model} onDismiss={hideSuccessModal} />
                            </Portal>
                            <View style={style.claimGiftContainer}>
                             <Checkbox 
@@ -214,11 +329,11 @@ The amount of tax we claim will be 25% of the total value of your donations in t
                            </View>
                            {checked==true?
                            <>
-                           <Input label="Country" required />
-                           <Input label="Address 1" required />
-                           <Input label="Address 2"  />
-                           <Input label="City" required />
-                           <Input label="Postal Code" required />
+                           <InputC label="Country" required />
+                           <InputC label="Address 1" required />
+                           <InputC label="Address 2"  />
+                           <InputC label="City" required />
+                           <InputC label="Postal Code" required />
                            </>
                            :""}
                         </View>
@@ -231,7 +346,7 @@ The amount of tax we claim will be 25% of the total value of your donations in t
                                     <Icon name="lock-closed" style={{paddingTop:4}} size={16} />
                                 <Text style={style.secureText}>This is a secure SSL encrypted payment.</Text>
                                 </View>
-                                <CardField style={style.cardField} cardStyle={{borderColor:"#696969",borderWidth:1,borderRadius:6}}  />
+                                <CardField style={style.cardField} cardStyle={{borderWidth:1,borderRadius:6,textColor:"#000000",placeholderColor:"#696969",cursorColor:"#000000",textErrorColor:"#ff0000"}}    />
                             </View>
                         </View>
                        
@@ -245,8 +360,10 @@ The amount of tax we claim will be 25% of the total value of your donations in t
                                
                             
                             <View style={style.buttonContainer}>
-                                <Button mode="contained" style={style.button} labelStyle={{ fontWeight: "900" }} onPress={onDonate}>DONATE NOW</Button>
-                            </View>
+                                {submitLoding?<ActivityIndicator size="large" color="red" />:
+                                <Button mode="contained" style={style.button} labelStyle={{ fontWeight: "900" }} textColor="#FFFF" onPress={onDonate}>DONATE NOW</Button>
+                            }
+                                </View>
                            
                             
                             

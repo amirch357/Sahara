@@ -38,12 +38,13 @@ marginBottom: 10,
     },
     price:{
         flexDirection:"row",
-        justifyContent:"space-between"
+        justifyContent:"space-between",
     },
     donation:{
         paddingTop:5,
         fontSize:16,
-        fontWeight:"800"
+        fontWeight:"800",
+        color:"#696969"
     },
     number:{
         color:"#ff0000",
@@ -60,7 +61,8 @@ marginBottom: 10,
         paddingBottom:10
     },
     buttonText:{
-        fontFamily:"PoppinsBold"
+        fontFamily:"PoppinsBold",
+        color:"#FFFF"
     },
     header:{
         fontSize:20,

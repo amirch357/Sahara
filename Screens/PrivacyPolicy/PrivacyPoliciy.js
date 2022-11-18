@@ -50,12 +50,14 @@ This Service does not use these “cookies” explicitly. However, the app may u
 const style=StyleSheet.create({
     header:{
         fontSize:26,
-        margin:10
+        margin:10,
+        color:"#696969"
     },
     content:{
         margin:10,
         color:"black",
-        lineHeight:25
+        lineHeight:25,
+        textAlign:"justify"
     },
     link:{
         margin:10,

@@ -1,5 +1,5 @@
-import React,{useState,useCallback} from "react";
-import { View,Text,Image, TouchableOpacity,ScrollView } from "react-native";
+import React,{useState,useEffect,useCallback} from "react";
+import { View,Text,Image, TouchableOpacity,ScrollView,BackHandler } from "react-native";
 import style from "../../Styles/DetailStyle"
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { Button} from "react-native-paper";
@@ -9,8 +9,23 @@ import { Progress } from "native-base";
 
 const Tab=createMaterialTopTabNavigator()
 
-const DetailScreen = ({route,navigation}) => {
+const DetailScreen = ({route,navigation},props) => {
     const {title,image,desc,goal,raised,progress}=route.params
+    const backActionDetal = () => {
+    navigation.goBack()
+      return true;
+    }
+useEffect(()=>{
+ 
+
+  const backHandlerDetail = BackHandler.addEventListener(
+    "hardwareBackPress",
+    backActionDetal
+  );
+
+  return () => backHandlerDetail.remove();
+},[])
+
 
 
     _renderTruncatedFooter = (handlePress) => {
@@ -41,7 +56,7 @@ const DetailScreen = ({route,navigation}) => {
           <Text style={style.title}>{title}</Text>
         </View>
         <View style={style.descContainer}>
-            <ReadMore style={style.desc} numberOfLines={3} renderTruncatedFooter={_renderTruncatedFooter} renderRevealedFooter={_renderRevealedFooter} onReady={()=>{<Text>Ready</Text>}}>{desc}</ReadMore>
+            <ReadMore style={style.desc} numberOfLines={3} renderTruncatedFooter={_renderTruncatedFooter} renderRevealedFooter={_renderRevealedFooter} onReady={()=>{<Text>Ready</Text>}}><Text style={{color:"#000"}}>{desc}</Text></ReadMore>
         </View>
         <View style={style.ProgressContainer}>
         <Progress style={style.ProgressBar} value={progress} _filledTrack={{bg:"#000341"}}  />
@@ -54,7 +69,7 @@ const DetailScreen = ({route,navigation}) => {
                 <Text  style={style.number}>£ {goal}</Text>
             </View>
             <View style={style.buttonContainer}>
-                <Button mode="contained" buttonColor="#9d0917" labelStyle={style.buttonText} onPress={()=>{navigation.navigate("Donate")}}>Donate Now</Button>
+                <Button mode="contained" buttonColor="#9d0917" labelStyle={style.buttonText} onPress={()=>{navigation.navigate("Donate",{title:title})}}>Donate Now</Button>
             </View>
         </View>
         </ScrollView>

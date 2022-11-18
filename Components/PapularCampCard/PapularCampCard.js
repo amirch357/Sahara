@@ -76,7 +76,8 @@ const style=StyleSheet.create({
         padding:3
     },
     goalText:{
-        fontSize:12
+        fontSize:12,
+        color:"#696969"
     },
     
 })

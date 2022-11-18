@@ -69,14 +69,14 @@ const [filters,setFilters]=useState([])
         currency="£" 
         goal={item.GOAL} 
         raised={item.RAISED}
-        progress={0} 
+        progress={item.GOAL_AVERAGE} 
         onPress={()=>navigation.navigate("Detail",{
             title:item.TITLE,
             image:`${IMAGE_URL}/${item.IMAGE}`,
             desc:item.DESCRIPTION,
             goal:item.GOAL,
             raised:item.RAISED,
-            progress:"23"
+            progress:item.GOAL_AVERAGE
         })}
 
         />
@@ -91,14 +91,14 @@ const [filters,setFilters]=useState([])
         currency="£" 
         goal={item.GOAL} 
         raised={item.RAISED}
-        progress={0} 
+        progress={item.GOAL_AVERAGE} 
         onPress={()=>navigation.navigate("Detail",{
             title:item.TITLE,
             image:`${IMAGE_URL}/${item.IMAGE}`, 
             desc:item.DESCRIPTION,
             goal:item.GOAL,
             raised:item.RAISED,
-            progress:"23"
+            progress:item.GOAL_AVERAGE
         })}
 
         />

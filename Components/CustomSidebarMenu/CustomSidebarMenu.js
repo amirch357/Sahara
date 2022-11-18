@@ -8,6 +8,9 @@ import {
   StyleSheet,
   Image,
   Text,
+  TouchableOpacity,
+  Linking,
+  ScrollView
 } from 'react-native';
  
 import {
@@ -15,12 +18,18 @@ import {
   DrawerItemList,
   DrawerItem,
 } from '@react-navigation/drawer';
- 
+ import Icon from "react-native-vector-icons/Ionicons"
+import { Button } from 'react-native-paper';
 const CustomSidebarMenu = (props) => {
-  
+  let aus="0061280144790"
+  let usa="0015038376008"
+  let pak="042111800111"
+  let uk="02030511207"
  
   return (
     <SafeAreaView style={{flex: 1}}>
+      <ScrollView>
+       
       {/*Top Large Image */}
       <View style={{justifyContent:"center",alignItems:"center"}}>
       <View style={styles.container}>
@@ -42,14 +51,21 @@ const CustomSidebarMenu = (props) => {
         />
         
       </DrawerContentScrollView>
+      
+     
+      {/* <TouchableOpacity onPress={()=>Linking.openURL("https://saharaforlife.org/")}>
       <Text
         style={{
           fontSize: 16,
           textAlign: 'center',
-          color: 'grey'
+          color: 'blue',
+          
         }}>
         www.saharaforlife.org
       </Text>
+      </TouchableOpacity> */}
+      
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -103,7 +119,24 @@ const styles = StyleSheet.create({
    
    
 
+  },
+  icon:{
+    height:50,
+    width:50,
+    margin:10
+  },
+  iconContainer:{
+    paddingBottom:10,
+    margin:10,
+    alignItems:"center"
+  },
+  button:{
+  height:40,
+  alignItems:"center",
+  justifyContent:"center",
+  margin:5
   }
 });
+
  
 export default CustomSidebarMenu;

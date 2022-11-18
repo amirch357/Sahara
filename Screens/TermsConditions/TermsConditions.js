@@ -32,12 +32,14 @@ At some point, we may wish to update the app. The app is currently available on 
 const style=StyleSheet.create({
     header:{
         fontSize:26,
-        margin:10
+        margin:10,
+        color:"#696969"
     },
     content:{
         margin:10,
         color:"black",
-        lineHeight:25
+        lineHeight:25,
+        textAlign:"justify"
     },
 })
 export default TermsConditions;
