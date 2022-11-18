@@ -29,35 +29,14 @@ function AuthIllustration(props) {
         ps={{ xl: "70px" }}
         justifyContent='start'
         direction='column'>
-        <NavLink
-          to='/admin'
-          style={() => ({
-            width: "fit-content",
-            marginTop: "40px",
-          })}>
-          <Flex
-            align='center'
-            ps={{ base: "25px", lg: "0px" }}
-            pt={{ lg: "0px", xl: "0px" }}
-            w='fit-content'>
-            <Icon
-              as={FaChevronLeft}
-              me='12px'
-              h='13px'
-              w='8px'
-              color='secondaryGray.600'
-            />
-            <Text ms='0px' fontSize='sm' color='secondaryGray.600'>
-              Back to Simmmple
-            </Text>
-          </Flex>
-        </NavLink>
+        
         {children}
         <Box
           display={{ base: "none", md: "block" }}
-          h='100%'
-          minH='100vh'
-          w={{ lg: "50vw", "2xl": "44vw" }}
+          h='50%'
+          m={{lg:"20vh"}}
+
+          w={{ lg: "30vw", "2xl": "14vw" }}
           position='absolute'
           right='0px'>
           <Flex
@@ -69,7 +48,7 @@ function AuthIllustration(props) {
             bgSize='cover'
             bgPosition='50%'
             position='absolute'
-            borderBottomLeftRadius={{ lg: "120px", xl: "200px" }}></Flex>
+            ></Flex>
         </Box>
         <Footer />
       </Flex>

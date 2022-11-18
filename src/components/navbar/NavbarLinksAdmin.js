@@ -19,7 +19,8 @@ import { ItemContent } from "components/menu/ItemContent";
 import { SearchBar } from "components/navbar/searchBar/SearchBar";
 import { SidebarResponsive } from "components/sidebar/Sidebar";
 import PropTypes from "prop-types";
-import React from "react";
+import React,{useEffect,useState} from "react";
+import { useHistory } from "react-router-dom";
 // Assets
 import navImage from "assets/img/layout/Navbar.png";
 import { MdNotificationsNone, MdInfoOutline } from "react-icons/md";
@@ -41,6 +42,22 @@ export default function HeaderLinks(props) {
     "14px 17px 40px 4px rgba(112, 144, 176, 0.18)",
     "14px 17px 40px 4px rgba(112, 144, 176, 0.06)"
   );
+const history=useHistory()
+const localData=JSON.parse(localStorage.getItem("userData"))
+console.log(localData.name)
+const [data,setData]=useState([]) 
+
+useEffect(()=>{
+  const localData=JSON.parse( localStorage.getItem("userData"))
+  console.log(localData)
+  
+  setData(localData)
+  
+},[])
+
+const name=data.map((res)=>(res.NAME))
+
+
   const borderButton = useColorModeValue("secondaryGray.500", "whiteAlpha.200");
   return (
     <Flex
@@ -169,38 +186,7 @@ export default function HeaderLinks(props) {
           minW={{ base: "unset" }}
           maxW={{ base: "360px", md: "unset" }}>
           <Image src={navImage} borderRadius='16px' mb='28px' />
-          <Flex flexDirection='column'>
-            <Link w='100%' href='https://horizon-ui.com/pro'>
-              <Button w='100%' h='44px' mb='10px' variant='brand'>
-                Buy Horizon UI PRO
-              </Button>
-            </Link>
-            <Link
-              w='100%'
-              href='https://horizon-ui.com/documentation/docs/introduction'>
-              <Button
-                w='100%'
-                h='44px'
-                mb='10px'
-                border='1px solid'
-                bg='transparent'
-                borderColor={borderButton}>
-                See Documentation
-              </Button>
-            </Link>
-            <Link
-              w='100%'
-              href='https://github.com/horizon-ui/horizon-ui-chakra'>
-              <Button
-                w='100%'
-                h='44px'
-                variant='no-hover'
-                color={textColor}
-                bg='transparent'>
-                Try Horizon Free
-              </Button>
-            </Link>
-          </Flex>
+        
         </MenuList>
       </Menu>
 
@@ -211,7 +197,7 @@ export default function HeaderLinks(props) {
           <Avatar
             _hover={{ cursor: "pointer" }}
             color='white'
-            name='Adela Parkson'
+            name={`${name}`}
             bg='#11047A'
             size='sm'
             w='40px'
@@ -236,7 +222,7 @@ export default function HeaderLinks(props) {
               fontSize='sm'
               fontWeight='700'
               color={textColor}>
-              👋&nbsp; Hey, Adela
+              {name}
             </Text>
           </Flex>
           <Flex flexDirection='column' p='10px'>
@@ -259,7 +245,12 @@ export default function HeaderLinks(props) {
               _focus={{ bg: "none" }}
               color='red.400'
               borderRadius='8px'
-              px='14px'>
+              px='14px'
+              onClick={()=>{
+                localStorage.removeItem("userData")
+                history.push("/")
+              }}
+              >
               <Text fontSize='sm'>Log out</Text>
             </MenuItem>
           </Flex>
