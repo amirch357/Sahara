@@ -21,8 +21,8 @@
 
 */
 
-import React from "react";
-import { NavLink } from "react-router-dom";
+import React,{useState,useEffect} from "react";
+import { NavLink,useHistory } from "react-router-dom";
 // Chakra imports
 import {
   Box,
@@ -38,6 +38,7 @@ import {
   InputRightElement,
   Text,
   useColorModeValue,
+  useToast,Spinner
 } from "@chakra-ui/react";
 // Custom components
 import { HSeparator } from "components/separator/Separator";
@@ -47,8 +48,14 @@ import illustration from "assets/img/auth/auth.png";
 import { FcGoogle } from "react-icons/fc";
 import { MdOutlineRemoveRedEye } from "react-icons/md";
 import { RiEyeCloseLine } from "react-icons/ri";
+import axios from "axios";
+import {LOGIN_URL} from "../../URLs/url"
 
 function SignIn() {
+  const [email,setEmail]= useState("")
+  const [password,setPassword]=useState("")
+  const [loading,setLoading]=useState(false)
+const toast=useToast()
   // Chakra color mode
   const textColor = useColorModeValue("navy.700", "white");
   const textColorSecondary = "gray.400";
@@ -65,10 +72,50 @@ function SignIn() {
     { bg: "secondaryGray.300" },
     { bg: "whiteAlpha.200" }
   );
-  const [show, setShow] = React.useState(false);
+  const [show, setShow] = useState(false);
   const handleClick = () => setShow(!show);
+  const history=useHistory()
+  const handleEmail=(event)=>setEmail(event.target.value)
+  const handlePassword=(event)=>setPassword(event.target.value)
+
+useEffect(()=>{
+  const userData= JSON.parse(localStorage.getItem("userData"))
+  if(userData){
+   return history.push("/admin/dashboard")
+  }
+})
+
+const Login= async ()=>{
+  setLoading(true)
+await axios.post(LOGIN_URL,{email:email,password:password}).then((responce)=>{
+  console.log(responce.data.message)
+  console.log( "Message........",responce.data.data.data)
+  if(responce.data.message==="LOGIN_SUCCESS"){
+    setLoading(false)
+    localStorage.setItem("userData", JSON.stringify(responce.data.data.data) )
+    history.push("/admin/dashboard")
+  }
+  setLoading(false)
+   
+  
+}).catch((error)=>{
+  console.log("errorrrr........",error.response.data.message)
+  if(error.response.data.message==="USER_NOT_FOUND"){
+    toast({
+      title:"Not Found",
+      description:"User Not Found",
+      status:"error"
+    })
+    setLoading(false)
+  }
+  setLoading(false)
+})
+}
+const userData= JSON.parse(localStorage.getItem("userData")) 
+console.log("local Data",userData)
+
   return (
-    <DefaultAuth illustrationBackground={illustration} image={illustration}>
+    <DefaultAuth illustrationBackground={illustration}>
       <Flex
         maxW={{ base: "100%", md: "max-content" }}
         w='100%'
@@ -104,27 +151,10 @@ function SignIn() {
           mx={{ base: "auto", lg: "unset" }}
           me='auto'
           mb={{ base: "20px", md: "auto" }}>
-          <Button
-            fontSize='sm'
-            me='0px'
-            mb='26px'
-            py='15px'
-            h='50px'
-            borderRadius='16px'
-            bg={googleBg}
-            color={googleText}
-            fontWeight='500'
-            _hover={googleHover}
-            _active={googleActive}
-            _focus={googleActive}>
-            <Icon as={FcGoogle} w='20px' h='20px' me='10px' />
-            Sign in with Google
-          </Button>
+          
           <Flex align='center' mb='25px'>
-            <HSeparator />
-            <Text color='gray.400' mx='14px'>
-              or
-            </Text>
+            
+            
             <HSeparator />
           </Flex>
           <FormControl>
@@ -147,6 +177,8 @@ function SignIn() {
               mb='24px'
               fontWeight='500'
               size='lg'
+              value={email}
+              onChange={handleEmail}
             />
             <FormLabel
               ms='4px'
@@ -165,6 +197,8 @@ function SignIn() {
                 size='lg'
                 type={show ? "text" : "password"}
                 variant='auth'
+                value={password}
+                onChange={handlePassword}
               />
               <InputRightElement display='flex' alignItems='center' mt='4px'>
                 <Icon
@@ -201,35 +235,21 @@ function SignIn() {
                 </Text>
               </NavLink>
             </Flex>
+            {loading?<Spinner size="lg" color="#8b0000" />:
             <Button
               fontSize='sm'
               variant='brand'
               fontWeight='500'
               w='100%'
               h='50'
-              mb='24px'>
+              mb='24px'
+              onClick={Login}
+              >
               Sign In
             </Button>
+            }
           </FormControl>
-          <Flex
-            flexDirection='column'
-            justifyContent='center'
-            alignItems='start'
-            maxW='100%'
-            mt='0px'>
-            <Text color={textColorDetails} fontWeight='400' fontSize='14px'>
-              Not registered yet?
-              <NavLink to='/auth/sign-up'>
-                <Text
-                  color={textColorBrand}
-                  as='span'
-                  ms='5px'
-                  fontWeight='500'>
-                  Create an Account
-                </Text>
-              </NavLink>
-            </Text>
-          </Flex>
+         
         </Flex>
       </Flex>
     </DefaultAuth>

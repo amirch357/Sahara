@@ -155,13 +155,13 @@ export default function Dashboard(props) {
               pt='50px'>
               <Switch>
                 {getRoutes(routes)}
-                <Redirect from='/' to='/admin/default' />
+                <Redirect from='/' to='/auth/default' />
               </Switch>
             </Box>
           ) : null}
-          <Box>
+          {/* <Box>
             <Footer />
-          </Box>
+          </Box> */}
         </Box>
       </SidebarContext.Provider>
     </Box>
