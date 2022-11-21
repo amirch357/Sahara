@@ -22,6 +22,7 @@ import {CREATE_APPEALS} from "../../../views/URLs/url"
     const [goal,setGoal]=useState("")
     const [desc,setDesc]=useState("")
     const [files,setFiles]=useState()
+    const [disable,setDisable]=useState(false)
     const [filePath,setFilePath]=useState(null)
     const [loading,setLoding]=useState(false)
     const handleTitle=(event)=>setTitle(event.target.value)
@@ -98,7 +99,14 @@ formData.append('image',files)
     }
 
 
-
+useEffect(()=>{
+  if(title.length===0 || desc.length===0 || goal.length===0 || filePath===null){
+    setDisable(true)
+  
+  }else{
+    setDisable(false)
+  }
+})
     
         
 
@@ -193,6 +201,7 @@ return(
                     _hover={{
                       bg: 'blue.500',
                     }}
+                    disabled={disable}
                     onClick={CreateAppeals}
                     isFullWidth>
                     Save
