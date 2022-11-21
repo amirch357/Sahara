@@ -79,6 +79,7 @@ const toast=useToast()
   const handlePassword=(event)=>setPassword(event.target.value)
 
 useEffect(()=>{
+  document.title="Sahara-admin"
   const userData= JSON.parse(localStorage.getItem("userData"))
   if(userData){
    return history.push("/admin/dashboard")
