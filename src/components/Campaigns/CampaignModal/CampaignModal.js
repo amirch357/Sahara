@@ -54,7 +54,6 @@ import {CREATE_APPEALS} from "../../../views/URLs/url"
         setLoding(true)
 console.log("my new file",files)
 const formData= new FormData();
-formData.append('ID',36)
 formData.append('title',title)
 formData.append('goal',goal)
 formData.append('description',desc)
