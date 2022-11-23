@@ -18,6 +18,7 @@ import axios from "axios"
 import CampaingModal from "./CampaignModal/CampaignModal"
 import { useDropzone } from "react-dropzone"
 import {APPEALS_URL,DELETE_URL} from "../../views/URLs/url"
+import ShowMoreText from "react-show-more-text"
 const Campaign=()=>{
     const [data,setData]=useState([])
     const {isOpen,onOpen,onClose}=useDisclosure()
@@ -27,14 +28,17 @@ const Campaign=()=>{
     const [deleteModal,setDeleteModal] = useState(false)
     const [goal,setGoal]=useState("")
     const [desc,setDesc]=useState("")
+    const [cate,setCate]=useState("")
     const [id,setId]=useState("")
     const [files,setFiles]=useState()
     const [filePath,setFilePath]=useState(null)
     const [loading,setLoding]=useState(false)
+    const [disable,setDisable]=useState(false)
     const [tableLoading,setTableLoading]=useState(true)
     const handleTitle=(event)=>setTitle(event.target.value)
     const handleGoal=(event)=>setGoal(event.target.value)
     const handleDesc=(event)=>setDesc(event.target.value)
+    const handleCate=(event)=>setCate(event.target.value)
    const toast=useToast()
     
 
@@ -76,9 +80,17 @@ const updateAppeals=async () =>{
     UpdateForm.append('title',title)
     UpdateForm.append('description',desc)
     UpdateForm.append('goal',goal)
+    UpdateForm.append('cate',cate)
     UpdateForm.append('image',files)
 await axios.put(`https://sflt.herokuapp.com/api/appeals/${id}`,UpdateForm).then((responce)=>{
     console.log(responce.status)
+  if(responce.status===201){
+    toast({
+      title:"Updated",
+      description:"Your data Update Success",
+      status:"success"
+    })
+  }
     setLoding(false)
 })
 }
@@ -99,12 +111,13 @@ await axios.delete(`${DELETE_URL}/${id}`).then((responce)=>{
 })
 }
 
-function EditModal(title,goal,description,image,id){
+function EditModal(title,goal,description,image,id,category){
 console.log(title)
 setTitle(title)
 setGoal(goal)
 setDesc(description)
 setId(id)
+setCate(category)
 setFilePath(`https://sflt.herokuapp.com/image/${image}`)
 setUpdateModal(true)
 }
@@ -116,10 +129,17 @@ setDeleteModal(true)
 }
 const {getInputProps,getRootProps}= useDropzone({onDrop})
 useEffect(()=>{
+  if(title.length===0 || goal.length===0){
+setDisable(true)
+  }else{
+    setDisable(false)
+  }
     getData()
-},[])
+})
 
 console.log("myfile..................",filePath)
+
+
 
     return(
         <>
@@ -162,7 +182,14 @@ console.log("myfile..................",filePath)
                       />
                     </InputGroup>
                   </FormControl>
-
+                  <FormControl isRequired>
+                    <FormLabel>Category</FormLabel>
+                        
+                    <InputGroup>
+                     
+                      <Input type="text" name="category" placeholder="Enter category" value={cate} onChange={handleCate} />
+                    </InputGroup>
+                  </FormControl>
                   <FormControl isRequired>
                     <FormLabel>Description</FormLabel>
 
@@ -208,6 +235,7 @@ console.log("myfile..................",filePath)
                     _hover={{
                       bg: 'blue.500',
                     }}
+                    disabled={disable}
                     onClick={updateAppeals}
                     isFullWidth>
                     Update
@@ -260,7 +288,7 @@ console.log("myfile..................",filePath)
             <TableContainer bg="Background" >
                   <Box overflowY="auto" maxHeight="470px" >
            
-        <Table >
+        <Table  >
         <Thead bg="#8b0000" textAlign="center" >
             <Tr>
             <Th color="#FFF" >ID</Th>
@@ -269,6 +297,7 @@ console.log("myfile..................",filePath)
             <Th color="#FFF">Created on</Th>
             <Th color="#FFF">Updated By</Th>
             <Th color="#FFF">Goal</Th>
+            <Th color="#FFF">Category</Th>
             <Th color="#FFF">Edit</Th>
             <Th color="#FFF">Delete</Th>
 
@@ -277,18 +306,19 @@ console.log("myfile..................",filePath)
         </Thead>
         {data.map((item)=>(
           
-            <Tbody>
+            <Tbody >
            
            
-                <Tr>
+                <Tr  >
                     <Td>{item.ID}</Td>
                     <Td position="sticky" bg="#FFF" left={0} top={0} >{item.TITLE}</Td>
-                    <Td  >{item.DESCRIPTION}</Td>
+                    <Td> <ShowMoreText lines={4} less="Show less" width={160} more="Show more" ><Text  fontSize="12px" >{item.DESCRIPTION}</Text></ShowMoreText></Td>
                     <Td>{item.CREATED_ON}</Td>
                     <Td>{item.UPDATED_BY}</Td>
                     <Td>{item.GOAL}</Td>
+                    <Td>{item.CATEGORY}</Td>
                     <Td>
-                        <IconButton  icon={ <EditIcon w="20px" h="20px" color="#8b0000" />} onClick={()=>EditModal(item?.TITLE,item?.GOAL,item?.DESCRIPTION,item?.IMAGE,item?.ID)} />
+                        <IconButton  icon={ <EditIcon w="20px" h="20px" color="#8b0000" />} onClick={()=>EditModal(item?.TITLE,item?.GOAL,item?.DESCRIPTION,item?.IMAGE,item?.ID,item?.CATEGORY)} />
                        
                     </Td>
                     <Td>

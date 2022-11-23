@@ -21,6 +21,7 @@ import {CREATE_APPEALS} from "../../../views/URLs/url"
     const [title,setTitle]=useState("")
     const [goal,setGoal]=useState("")
     const [desc,setDesc]=useState("")
+    const [cat,setCat]=useState("")
     const [files,setFiles]=useState()
     const [disable,setDisable]=useState(false)
     const [filePath,setFilePath]=useState(null)
@@ -28,6 +29,7 @@ import {CREATE_APPEALS} from "../../../views/URLs/url"
     const handleTitle=(event)=>setTitle(event.target.value)
     const handleGoal=(event)=>setGoal(event.target.value)
     const handleDesc=(event)=>setDesc(event.target.value)
+    const handleCat=(event)=>setCat(event.target.value)
    const toast=useToast()
 
     const onDrop = useCallback((acceptedFiles) => {
@@ -57,6 +59,7 @@ console.log("my new file",files)
 const formData= new FormData();
 formData.append('title',title)
 formData.append('goal',goal)
+formData.append('cate',cat)
 formData.append('description',desc)
 formData.append('image',files)
 
@@ -100,7 +103,7 @@ formData.append('image',files)
 
 
 useEffect(()=>{
-  if(title.length===0 || desc.length===0 || goal.length===0 || filePath===null){
+  if(title.length===0   || filePath===null || cat.length===0 || goal.length===0){
     setDisable(true)
   
   }else{
@@ -141,7 +144,7 @@ return(
                     </InputGroup>
                   </FormControl>
 
-                  <FormControl isRequired>
+                  <FormControl>
                     <FormLabel>Goal</FormLabel>
 
                     <InputGroup>
@@ -155,8 +158,15 @@ return(
                       />
                     </InputGroup>
                   </FormControl>
+                  <FormControl>
+                    <FormLabel>Category</FormLabel>
 
-                  <FormControl isRequired>
+                    <InputGroup>
+                     
+                      <Input type="text" name="category" placeholder="Enter category" value={cat} onChange={handleCat} />
+                    </InputGroup>
+                  </FormControl>
+                  <FormControl>
                     <FormLabel>Description</FormLabel>
 
                     <Textarea
